@@ -22,8 +22,14 @@ export default function ActivitiesPage() {
     const formData = new FormData(e.target);
     const name = formData.get("name");
     const description = formData.get("description");
-    await createActivity({ name, description });
-    e.target.reset();
+    try {
+      await createActivity({ name, description });
+      e.target.reset();
+    } catch (err) {
+      // createError state is already set by useMutation; nothing else required
+      // but ensure we don't leave an unhandled rejection.
+      console.error(err);
+    }
   }
   // Set up mutation for deleting activities
   // useMutation will call DELETE /activities/{id} and refresh the activities list
@@ -62,8 +68,8 @@ export default function ActivitiesPage() {
           <button disabled={createLoading}>
             {createLoading ? "Adding..." : "Add Activity"}
           </button>
-          {/* Show error message if activity creation fails */}
-          {createError && <p style={{ color: "red" }}>{createError}</p>}
+          {/* Show error message if activity creation fails (styled like activity errors) */}
+          {createError && <div className="activity-error">{createError}</div>}
         </form>
       )}
       {/* Show loading message while fetching data */}
